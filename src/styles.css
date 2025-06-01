@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  background-color: #000;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+.game-container {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  margin: auto;
+  top: 20px;
+  border: 2px solid white;
+}
+
+.game-canvas {
+  background-color: #333;
+  display: block;
+}
+
+.health-bar {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 200px;
+  height: 20px;
+  border: 2px solid white;
+  background: #222;
+}
+
+.health-fill {
+  height: 100%;
+  background: limegreen;
+}
+
+.overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  border-radius: 10px;
+}

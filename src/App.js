@@ -1,15 +1,9 @@
-import logo from './logo.svg';
-import './App.css';
-import Platform from './patuti/Platform';
+import React from "react";
+import GameCanvas from "./patuti/GameCanvas";
+import "./styles.css";
 
 function App() {
-  return (
-    <div>
-      <Platform />
-    </div>
-  );
+  return <GameCanvas />;
 }
-
-
 
 export default App;
