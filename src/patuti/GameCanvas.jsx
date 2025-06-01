@@ -98,7 +98,7 @@ const GameCanvas = () => {
       });
 
       if (bulletsRef.current.length < 2) {
-        if (Math.random() < 0.01) { 
+        if (Math.random() < 0.51) { 
           if (Math.random() < 0.5) {
             bulletsRef.current.push(new Bullet(canvas.width, Math.random() * 300 + 50, "horizontal"));
           } else {

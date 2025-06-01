@@ -34,7 +34,7 @@ class Player {
     this.width = 50;
     this.height = 60;
     this.velocityY = 0;
-    this.jumpPower = -15;
+    this.jumpPower = -10;
     this.gravity = 0.8;
     this.speed = 5;
     this.grounded = false;
