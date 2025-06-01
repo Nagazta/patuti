@@ -10,7 +10,6 @@ const GameCanvas = () => {
   const [health, setHealth] = useState(100);
   const [isGameOver, setIsGameOver] = useState(false);
   
-  // Use useRef for all game state to avoid closure issues
   const keysRef = useRef({});
   const playerRef = useRef(new Player());
   const bulletsRef = useRef([
@@ -23,7 +22,7 @@ const GameCanvas = () => {
     playerRef.current = new Player();
     setHealth(100);
     setIsGameOver(false);
-    keysRef.current = {}; // Reset keys
+    keysRef.current = {}; 
     bulletsRef.current = [
       new Bullet(800, 100, "horizontal"),
       new Bullet(200, 0, "vertical"),
@@ -38,7 +37,7 @@ const GameCanvas = () => {
     const handleKeyDown = (e) => {
       e.preventDefault();
       keysRef.current[e.key] = true;
-      console.log('Key pressed:', e.key); // Debug log
+      console.log('Key pressed:', e.key); 
       if (e.key === "r" && isGameOver) resetGame();
     };
 
@@ -50,7 +49,6 @@ const GameCanvas = () => {
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
 
-    // Focus the canvas to ensure it receives keyboard events
     if (canvas) {
       canvas.focus();
     }
@@ -71,29 +69,24 @@ const GameCanvas = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // Update and draw player
       playerRef.current.update(keysRef.current, platformsRef.current);
       playerRef.current.draw(ctx);
 
-      // Draw platforms
       platformsRef.current.forEach((platform) => platform.draw(ctx));
 
-      // Update and draw bullets
       bulletsRef.current = bulletsRef.current.filter((bullet) => {
         bullet.update();
         bullet.draw(ctx);
         
-        // Check collision with player
         if (checkCollision(playerRef.current, bullet)) {
           setHealth((prev) => {
             const newHealth = prev - 20;
             if (newHealth <= 0) setIsGameOver(true);
             return newHealth;
           });
-          return false; // Remove bullet
+          return false; 
         }
         
-        // Remove bullets that are off-screen
         if (bullet.direction === "horizontal" && bullet.x < -bullet.width) {
           return false;
         }
@@ -101,13 +94,11 @@ const GameCanvas = () => {
           return false;
         }
         
-        return true; // Keep bullet
+        return true; 
       });
 
-      // Respawn bullets when they're removed (optional - for continuous gameplay)
       if (bulletsRef.current.length < 2) {
-        // Add new bullets occasionally
-        if (Math.random() < 0.01) { // 1% chance per frame
+        if (Math.random() < 0.01) { 
           if (Math.random() < 0.5) {
             bulletsRef.current.push(new Bullet(canvas.width, Math.random() * 300 + 50, "horizontal"));
           } else {
@@ -116,7 +107,6 @@ const GameCanvas = () => {
         }
       }
 
-      // Check if player fell off screen
       if (playerRef.current.y > 600) setIsGameOver(true);
 
       if (!isGameOver) animationFrameId = requestAnimationFrame(gameLoop);
@@ -129,8 +119,7 @@ const GameCanvas = () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [isGameOver]); // Removed player and platforms from dependencies
-
+  }, [isGameOver]); 
   return (
     <div className="game-container">
       <canvas 

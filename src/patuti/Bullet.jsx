@@ -5,14 +5,20 @@ class Bullet {
   constructor(x, y, direction = "horizontal") {
     this.x = x;
     this.y = y;
-    this.width = 20;
-    this.height = 20;
+    
+    if (direction === "horizontal") {
+      this.width = 40; 
+      this.height = 20; 
+    } else {
+      this.width = 20;  
+      this.height = 40; 
+    }
+    
     this.speed = 5;
     this.direction = direction;
     this.image = new Image();
     this.imageLoaded = false;
     
-    // Set up image loading
     this.image.onload = () => {
       this.imageLoaded = true;
     };
@@ -31,7 +37,6 @@ class Bullet {
     if (this.imageLoaded) {
       ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     } else {
-      // Fallback: draw a colored rectangle if image isn't loaded
       ctx.fillStyle = this.direction === "vertical" ? "red" : "blue";
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
