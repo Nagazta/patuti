@@ -29,8 +29,8 @@ import jump7 from "../images/jump-7.png";
 
 class Player {
   constructor() {
-    this.x = 380;
-    this.y = 100;
+    this.x = 680;
+    this.y = 310;
     this.width = 50;
     this.height = 60;
     this.velocityY = 0;
@@ -67,7 +67,7 @@ class Player {
     this.isDocking = false;
   }
 
-  update(keys, platforms) {
+  update(keys, platforms, canvasWidth = 800) {
     this.isMovingLeft = false;
     this.isMovingRight = false;
     this.isDocking = false;
@@ -93,8 +93,9 @@ class Player {
     this.y += this.velocityY;
     this.velocityY += this.gravity;
 
+    // Use dynamic canvas width for boundary checking
     if (this.x < 0) this.x = 0;
-    if (this.x + this.width > 800) this.x = 800 - this.width;
+    if (this.x + this.width > canvasWidth) this.x = canvasWidth - this.width;
 
     let onPlatform = false;
     platforms.forEach(platform => {

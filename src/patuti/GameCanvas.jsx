@@ -9,6 +9,7 @@ const GameCanvas = () => {
   const canvasRef = useRef(null);
   const [health, setHealth] = useState(100);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   
   const keysRef = useRef({});
   const playerRef = useRef(new Player());
@@ -16,7 +17,7 @@ const GameCanvas = () => {
     new Bullet(800, 100, "horizontal"),
     new Bullet(200, 0, "vertical"),
   ]);
-  const platformsRef = useRef([new Platform(300, 300, 200, 100)]);
+  const platformsRef = useRef([new Platform(600, 400, 200, 100)]);
 
   const resetGame = () => {
     playerRef.current = new Player();
@@ -24,10 +25,24 @@ const GameCanvas = () => {
     setIsGameOver(false);
     keysRef.current = {}; 
     bulletsRef.current = [
-      new Bullet(800, 100, "horizontal"),
+      new Bullet(canvasSize.width, 100, "horizontal"),
       new Bullet(200, 0, "vertical"),
     ];
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCanvasSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    handleResize(); 
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -69,7 +84,7 @@ const GameCanvas = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      playerRef.current.update(keysRef.current, platformsRef.current);
+      playerRef.current.update(keysRef.current, platformsRef.current, canvas.width);
       playerRef.current.draw(ctx);
 
       platformsRef.current.forEach((platform) => platform.draw(ctx));
@@ -107,7 +122,7 @@ const GameCanvas = () => {
         }
       }
 
-      if (playerRef.current.y > 600) setIsGameOver(true);
+      if (playerRef.current.y > canvas.height) setIsGameOver(true);
 
       if (!isGameOver) animationFrameId = requestAnimationFrame(gameLoop);
     };
@@ -119,13 +134,14 @@ const GameCanvas = () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [isGameOver]); 
+  }, [isGameOver, canvasSize]); 
+
   return (
     <div className="game-container">
       <canvas 
         ref={canvasRef} 
-        width={800} 
-        height={600} 
+        width={canvasSize.width} 
+        height={canvasSize.height} 
         className="game-canvas"
         tabIndex="0"
         style={{ outline: 'none' }}
