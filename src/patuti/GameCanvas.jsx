@@ -8,6 +8,13 @@ import bulletH from "../images/bullet_h.png";
 import bulletV from "../images/bullet_v.png";
 
 const GameCanvas = () => {
+
+  const bulletHImage = new Image();
+  bulletHImage.src = bulletH;
+
+  const bulletVImage = new Image();
+  bulletVImage.src = bulletV;
+
   const canvasRef = useRef(null);
   const [health, setHealth] = useState(100);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -21,9 +28,9 @@ const GameCanvas = () => {
   const turretTimersRef = useRef([]); 
 
   const staticTurretsRef = useRef([
-    { x: canvasSize.width - -1100, y: 200, direction: "horizontal" },
-    { x: canvasSize.width - -1100, y: 300, direction: "horizontal" },
-    { x: canvasSize.width - -1100, y: 400, direction: "horizontal" },
+    { x: canvasSize.width - -1100, y: 100, direction: "horizontal" },
+    { x: canvasSize.width - -1100, y: 230, direction: "horizontal" },
+    { x: canvasSize.width - -1100, y: 360, direction: "horizontal" },
     { x: 850, y: -50, direction: "vertical" },
     { x: 1000, y: -50, direction: "vertical" },
     { x: 1150, y: -50, direction: "vertical" },
@@ -95,10 +102,14 @@ const GameCanvas = () => {
 
       platformsRef.current.forEach((platform) => platform.draw(ctx));
 
-      staticTurretsRef.current.forEach((turret) => {
-        const dummyBullet = new Bullet(turret.x, turret.y, turret.direction);
-        dummyBullet.draw(ctx);
-      });
+     staticTurretsRef.current.forEach((turret) => {
+      const image = turret.direction === "vertical" ? bulletVImage : bulletHImage;
+      const width = turret.direction === "vertical" ? 30 : 60;
+      const height = turret.direction === "vertical" ? 60 : 30;
+      
+      ctx.drawImage(image, turret.x, turret.y, width, height);
+    });
+
 
       bulletsRef.current = bulletsRef.current.filter((bullet) => {
         bullet.update();

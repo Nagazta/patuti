@@ -32,7 +32,7 @@ class Player {
     this.x = 900;
     this.y = 340;
     this.width = 120;
-    this.height = 80;
+    this.height = 40;
     this.originalHeight = 160; 
     this.velocityY = 0;
     this.jumpPower = -20;
