@@ -65,7 +65,7 @@ const GameCanvas = () => {
     const handleKeyDown = (e) => {
       e.preventDefault();
       keysRef.current[e.key] = true;
-      if (e.key === "r" && isGameOver) resetGame();
+      if (e.key === "r" || "R" && isGameOver) resetGame();
     };
 
     const handleKeyUp = (e) => {
