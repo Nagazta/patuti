@@ -29,15 +29,16 @@ import jump7 from "../images/jump-7.png";
 
 class Player {
   constructor() {
-    this.x = 680;
-    this.y = 310;
-    this.width = 50;
-    this.height = 60;
+    this.x = 900;
+    this.y = 340;
+    this.width = 150;
+    this.height = 160;
+    this.originalHeight = 160; 
     this.velocityY = 0;
-    this.jumpPower = -10;
+    this.jumpPower = -20;
     this.gravity = 0.8;
     this.speed = 5;
-    this.grounded = false;
+    this.grounded = true;
 
     this.currentAnimation = "idle";
     this.currentFrame = 0;
@@ -81,22 +82,39 @@ class Player {
       this.isMovingLeft = true;
     }
     
+    const wasDocking = this.isDocking;
     if (keys["ArrowDown"] || keys["s"] || keys["S"]) {
       this.isDocking = true;
+      const newHeight = this.originalHeight * 0.6;
+      if (this.height !== newHeight) {
+        this.height = newHeight;
+      }
+    } else {
+      this.isDocking = false;
+      if (this.height !== this.originalHeight && !this.grounded) {
+        if (this.grounded && wasDocking) {
+          const heightDifference = this.originalHeight - this.height;
+          this.y += heightDifference + 50; 
+        }
+        this.height = this.originalHeight;
+      }
     }
     
-    if ((keys["ArrowUp"] || keys["w"] || keys["W"] || keys[" "]) && this.grounded) {
+    // Jump controls - prevent jumping while docking
+    if ((keys["ArrowUp"] || keys["w"] || keys["W"] || keys[" "]) && this.grounded && !this.isDocking) {
       this.velocityY = this.jumpPower;
       this.grounded = false;
     }
 
+    // Apply gravity
     this.y += this.velocityY;
     this.velocityY += this.gravity;
 
-    // Use dynamic canvas width for boundary checking
+    // Boundary checking
     if (this.x < 0) this.x = 0;
     if (this.x + this.width > canvasWidth) this.x = canvasWidth - this.width;
 
+    // Platform collision detection
     let onPlatform = false;
     platforms.forEach(platform => {
       if (
@@ -145,7 +163,7 @@ class Player {
       this.frameCounter = 0;
       this.currentFrame++;
       
-    if (this.currentFrame >= this.animations[this.currentAnimation].length) {
+      if (this.currentFrame >= this.animations[this.currentAnimation].length) {
         this.currentFrame = 0;
       }
     }
@@ -156,6 +174,16 @@ class Player {
     if (currentImg) {
       ctx.drawImage(currentImg, this.x, this.y, this.width, this.height);
     }
+  }
+
+  // Method to get collision bounds (useful for bullet collision)
+  getCollisionBounds() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height
+    };
   }
 }
 

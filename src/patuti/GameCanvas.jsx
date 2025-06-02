@@ -14,10 +14,10 @@ const GameCanvas = () => {
   const keysRef = useRef({});
   const playerRef = useRef(new Player());
   const bulletsRef = useRef([
-    new Bullet(800, 100, "horizontal"),
-    new Bullet(200, 0, "vertical"),
+    new Bullet(800, 400, "horizontal"),
+    new Bullet(800, 0, "vertical"),
   ]);
-  const platformsRef = useRef([new Platform(600, 400, 200, 100)]);
+  const platformsRef = useRef([new Platform(750, 500, 500, 300)]);
 
   const resetGame = () => {
     playerRef.current = new Player();
@@ -25,7 +25,7 @@ const GameCanvas = () => {
     setIsGameOver(false);
     keysRef.current = {}; 
     bulletsRef.current = [
-      new Bullet(canvasSize.width, 100, "horizontal"),
+      new Bullet(canvasSize.width, 400, "horizontal"),
       new Bullet(200, 0, "vertical"),
     ];
   };
@@ -68,14 +68,16 @@ const GameCanvas = () => {
       canvas.focus();
     }
 
-    const checkCollision = (objA, objB) => {
-      return (
-        objA.x < objB.x + objB.width &&
-        objA.x + objA.width > objB.x &&
-        objA.y < objB.y + objB.height &&
-        objA.y + objA.height > objB.y
-      );
-    };
+    
+const checkCollision = (player, bullet) => {
+  const playerBounds = player.getCollisionBounds();
+  return (
+    playerBounds.x < bullet.x + bullet.width &&
+    playerBounds.x + playerBounds.width > bullet.x &&
+    playerBounds.y < bullet.y + bullet.height &&
+    playerBounds.y + playerBounds.height > bullet.y
+  );
+};
 
     const bg = new Image();
     bg.src = backgroundImg;
@@ -95,7 +97,7 @@ const GameCanvas = () => {
         
         if (checkCollision(playerRef.current, bullet)) {
           setHealth((prev) => {
-            const newHealth = prev - 20;
+            const newHealth = prev - 5;
             if (newHealth <= 0) setIsGameOver(true);
             return newHealth;
           });
@@ -112,7 +114,7 @@ const GameCanvas = () => {
         return true; 
       });
 
-      if (bulletsRef.current.length < 2) {
+      if (bulletsRef.current.length < 3) {
         if (Math.random() < 0.51) { 
           if (Math.random() < 0.5) {
             bulletsRef.current.push(new Bullet(canvas.width, Math.random() * 300 + 50, "horizontal"));
