@@ -7,11 +7,11 @@ class Bullet {
     this.y = y;
     
     if (direction === "horizontal") {
-      this.width = 80; 
-      this.height = 40; 
+      this.width = 60; 
+      this.height = 30; 
     } else {
-      this.width = 40;  
-      this.height = 80; 
+      this.width = 30;  
+      this.height = 60; 
     }
     
     this.speed = 10;

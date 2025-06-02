@@ -4,44 +4,50 @@ import Bullet from "./Bullet";
 import Platform from "./Platform";
 import HealthBar from "./HealthBar";
 import backgroundImg from "../images/background.png";
+import bulletH from "../images/bullet_h.png";
+import bulletV from "../images/bullet_v.png";
 
 const GameCanvas = () => {
   const canvasRef = useRef(null);
   const [health, setHealth] = useState(100);
   const [isGameOver, setIsGameOver] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
-  
+
   const keysRef = useRef({});
   const playerRef = useRef(new Player());
-  const bulletsRef = useRef([
-    new Bullet(800, 400, "horizontal"),
-    new Bullet(800, 0, "vertical"),
-  ]);
+  const bulletsRef = useRef([]); // No initial bullets
   const platformsRef = useRef([new Platform(750, 500, 500, 300)]);
+
+  const turretTimersRef = useRef([]); 
+
+  const staticTurretsRef = useRef([
+    { x: canvasSize.width - -1100, y: 200, direction: "horizontal" },
+    { x: canvasSize.width - -1100, y: 300, direction: "horizontal" },
+    { x: canvasSize.width - -1100, y: 400, direction: "horizontal" },
+    { x: 850, y: -50, direction: "vertical" },
+    { x: 1000, y: -50, direction: "vertical" },
+    { x: 1150, y: -50, direction: "vertical" },
+  ]);
 
   const resetGame = () => {
     playerRef.current = new Player();
     setHealth(100);
     setIsGameOver(false);
-    keysRef.current = {}; 
-    bulletsRef.current = [
-      new Bullet(canvasSize.width, 400, "horizontal"),
-      new Bullet(200, 0, "vertical"),
-    ];
+    keysRef.current = {};
+    bulletsRef.current = [];
   };
 
   useEffect(() => {
     const handleResize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       });
     };
 
-    handleResize(); 
-    window.addEventListener('resize', handleResize);
-    
-    return () => window.removeEventListener('resize', handleResize);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -52,7 +58,6 @@ const GameCanvas = () => {
     const handleKeyDown = (e) => {
       e.preventDefault();
       keysRef.current[e.key] = true;
-      console.log('Key pressed:', e.key); 
       if (e.key === "r" && isGameOver) resetGame();
     };
 
@@ -68,16 +73,15 @@ const GameCanvas = () => {
       canvas.focus();
     }
 
-    
-const checkCollision = (player, bullet) => {
-  const playerBounds = player.getCollisionBounds();
-  return (
-    playerBounds.x < bullet.x + bullet.width &&
-    playerBounds.x + playerBounds.width > bullet.x &&
-    playerBounds.y < bullet.y + bullet.height &&
-    playerBounds.y + playerBounds.height > bullet.y
-  );
-};
+    const checkCollision = (player, bullet) => {
+      const playerBounds = player.getCollisionBounds();
+      return (
+        playerBounds.x < bullet.x + bullet.width &&
+        playerBounds.x + playerBounds.width > bullet.x &&
+        playerBounds.y < bullet.y + bullet.height &&
+        playerBounds.y + playerBounds.height > bullet.y
+      );
+    };
 
     const bg = new Image();
     bg.src = backgroundImg;
@@ -91,62 +95,74 @@ const checkCollision = (player, bullet) => {
 
       platformsRef.current.forEach((platform) => platform.draw(ctx));
 
+      staticTurretsRef.current.forEach((turret) => {
+        const dummyBullet = new Bullet(turret.x, turret.y, turret.direction);
+        dummyBullet.draw(ctx);
+      });
+
       bulletsRef.current = bulletsRef.current.filter((bullet) => {
         bullet.update();
         bullet.draw(ctx);
-        
+
         if (checkCollision(playerRef.current, bullet)) {
           setHealth((prev) => {
             const newHealth = prev - 5;
             if (newHealth <= 0) setIsGameOver(true);
             return newHealth;
           });
-          return false; 
+          return false;
         }
-        
+
         if (bullet.direction === "horizontal" && bullet.x < -bullet.width) {
           return false;
         }
         if (bullet.direction === "vertical" && bullet.y > canvas.height) {
           return false;
         }
-        
-        return true; 
-      });
 
-      if (bulletsRef.current.length < 3) {
-        if (Math.random() < 0.51) { 
-          if (Math.random() < 0.5) {
-            bulletsRef.current.push(new Bullet(canvas.width, Math.random() * 300 + 50, "horizontal"));
-          } else {
-            bulletsRef.current.push(new Bullet(Math.random() * canvas.width, -20, "vertical"));
-          }
-        }
-      }
+        return true;
+      });
 
       if (playerRef.current.y > canvas.height) setIsGameOver(true);
 
       if (!isGameOver) animationFrameId = requestAnimationFrame(gameLoop);
     };
 
+    const startTurretFiring = () => {
+      staticTurretsRef.current.forEach((turret) => {
+        const fireBullet = () => {
+          if (!isGameOver) {
+            bulletsRef.current.push(new Bullet(turret.x, turret.y, turret.direction));
+            const delay = Math.random() * 10000 + 1800; 
+            const timerId = setTimeout(fireBullet, delay);
+            turretTimersRef.current.push(timerId);
+          }
+        };
+        fireBullet();
+      });
+    };
+
+    startTurretFiring();
     gameLoop();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      turretTimersRef.current.forEach(clearTimeout);
+      turretTimersRef.current = [];
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [isGameOver, canvasSize]); 
+  }, [isGameOver, canvasSize]);
 
   return (
     <div className="game-container">
-      <canvas 
-        ref={canvasRef} 
-        width={canvasSize.width} 
-        height={canvasSize.height} 
+      <canvas
+        ref={canvasRef}
+        width={canvasSize.width}
+        height={canvasSize.height}
         className="game-canvas"
         tabIndex="0"
-        style={{ outline: 'none' }}
+        style={{ outline: "none" }}
       />
       <HealthBar health={health} />
       {isGameOver && <div className="overlay">Game Over — Press R to Restart</div>}
